@@ -1,0 +1,29 @@
+services:
+  # 1. SCGRS AI Python Microservice
+  - type: web
+    name: scgrs-ai-service
+    env: python
+    buildCommand: "cd ai-service && pip install -r requirements.txt"
+    startCommand: "cd ai-service && python app.py"
+    envVars:
+      - key: PORT
+        value: 5000
+
+  # 2. SCGRS Express / Node.js Backend API
+  - type: web
+    name: scgrs-backend
+    env: node
+    buildCommand: "cd backend && npm install"
+    startCommand: "cd backend && npm start"
+    envVars:
+      - key: PORT
+        value: 5001
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: AI_SERVICE_URL
+        fromService:
+          type: web
+          name: scgrs-ai-service
+          property: host
